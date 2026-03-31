@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <h1>Advanced E-Commerce Customer Behavior Analytics & Recommendation System</h1>
+    <p>
+        This project analyzes e-commerce data, shows business insights,
+        and recommends products using content-based, collaborative, and hybrid filtering.
+    </p>
+    <div class="hero-buttons">
+        <a class="btn" href="{{ url_for('signup') }}">Get Started</a>
+        <a class="btn secondary" href="{{ url_for('analytics') }}">View Analytics</a>
+    </div>
+</div>
+
+<h2>Project Statistics</h2>
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total Users</h3>
+        <p>{{ stats.total_users }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Total Products</h3>
+        <p>{{ stats.total_products }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Total Categories</h3>
+        <p>{{ stats.total_categories }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Average Price</h3>
+        <p>₹ {{ stats.avg_price }}</p>
+    </div>
+</div>
+
+<h2>Trending Products</h2>
+<div class="card-grid">
+    {% for item in trending_products %}
+    <div class="card">
+        <h3>{{ item.name }}</h3>
+        <p><strong>Brand:</strong> {{ item.brand }}</p>
+        <p><strong>Category:</strong> {{ item.category_code }}</p>
+        <p><strong>Average Price:</strong> ₹ {{ '%.2f'|format(item.avg_price) }}</p>
+        <p><strong>Average Rating:</strong> {{ item.avg_rating }}</p>
+        <p><strong>Interactions:</strong> {{ item.interaction_count }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

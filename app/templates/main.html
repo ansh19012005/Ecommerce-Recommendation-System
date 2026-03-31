@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Welcome, {{ username }}</h2>
+
+<div class="form-box">
+    <h3>Select a Product</h3>
+    <form action="{{ url_for('main') }}" method="POST" class="recommendation-form">
+        <select name="product_name" required>
+            <option value="">Choose product</option>
+            {% for product in product_names %}
+                <option value="{{ product }}">{{ product }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn">Get Recommendations</button>
+    </form>
+</div>
+
+{% if recommendations %}
+<h2>Recommended Products</h2>
+<div class="card-grid">
+    {% for item in recommendations %}
+    <div class="card">
+        <h3>{{ item.name if item.name is defined else item.Name }}</h3>
+        <p><strong>Brand:</strong> {{ item.brand }}</p>
+        <p><strong>Category:</strong> {{ item.category_code }}</p>
+        <p><strong>Price:</strong> ₹{{ item.price }}</p>
+        <p><strong>Score:</strong> {{ item.score if item.score is defined else item.similarity_score }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

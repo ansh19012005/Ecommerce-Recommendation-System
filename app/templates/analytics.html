@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero analytics-hero">
+    <h1>Analytics Dashboard</h1>
+    <p>
+        Monitor customer behavior, product trends, recommendation performance,
+        customer segments, and market basket insights in one place.
+    </p>
+</section>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total Users</h3>
+        <p>{{ total_users }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Total Products</h3>
+        <p>{{ total_products }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Total Categories</h3>
+        <p>{{ total_categories }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Average Price</h3>
+        <p>₹{{ avg_price }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Total Orders</h3>
+        <p>{{ total_orders }}</p>
+    </div>
+    <div class="stat-card">
+        <h3>Total Revenue</h3>
+        <p>₹{{ total_revenue }}</p>
+    </div>
+</div>
+
+<div class="two-col">
+    <div class="card">
+        <h2>Top Brands</h2>
+        <ul class="clean-list">
+            {% for item in top_brands %}
+            <li>
+                <span>{{ item.brand }}</span>
+                <strong>{{ item.count }}</strong>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Top Categories</h2>
+        <ul class="clean-list">
+            {% for item in top_categories %}
+            <li>
+                <span>{{ item.category }}</span>
+                <strong>{{ item.count }}</strong>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="two-col">
+    <div class="card">
+        <h2>Brand Distribution</h2>
+        <canvas id="brandChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h2>Category Distribution</h2>
+        <canvas id="categoryChart"></canvas>
+    </div>
+</div>
+
+<div class="two-col">
+    <div class="card">
+        <h2>Customer Segments Chart</h2>
+        <canvas id="segmentChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h2>Trending Products Chart</h2>
+        <canvas id="trendingChart"></canvas>
+    </div>
+</div>
+
+<div class="two-col">
+    <div class="card">
+        <h2>Recommendation Metrics</h2>
+        {% if rec_metrics %}
+        <div class="mini-grid">
+            {% for key, value in rec_metrics.items() %}
+            <div class="mini-stat">
+                <span>{{ key.replace("_", " ").title() }}</span>
+                <strong>{{ value }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No recommendation evaluation data found.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Segmentation Metrics</h2>
+        {% if seg_metrics %}
+        <div class="mini-grid">
+            {% for key, value in seg_metrics.items() %}
+            <div class="mini-stat">
+                <span>{{ key.replace("_", " ").title() }}</span>
+                <strong>{{ value }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No segmentation evaluation data found.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h2>Business Metrics</h2>
+    {% if business_metrics %}
+    <div class="mini-grid">
+        {% for key, value in business_metrics.items() %}
+        <div class="mini-stat">
+            <span>{{ key.replace("_", " ").title() }}</span>
+            <strong>{{ value }}</strong>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No business metrics file found.</p>
+    {% endif %}
+</div>
+
+<div class="two-col">
+    <div class="card">
+        <h2>Customer Segments</h2>
+        {% if segment_summary %}
+        <ul class="clean-list">
+            {% for item in segment_summary %}
+            <li>
+                <span>{{ item.segment_name }}</span>
+                <strong>{{ item.count }}</strong>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No segment data found.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Trending Products</h2>
+        {% if trending_products %}
+        <ul class="clean-list">
+            {% for item in trending_products %}
+            <li>
+                <div>
+                    <strong>{{ item.name }}</strong><br>
+                    <small>{{ item.brand }}</small>
+                </div>
+                <span>{{ item.interaction_count }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No trending product data found.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h2>Top Market Basket Rules</h2>
+    {% if basket_rules %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Antecedents</th>
+                    <th>Consequents</th>
+                    <th>Support</th>
+                    <th>Confidence</th>
+                    <th>Lift</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in basket_rules %}
+                <tr>
+                    <td>{{ row.antecedents }}</td>
+                    <td>{{ row.consequents }}</td>
+                    <td>{{ "%.4f"|format(row.support) }}</td>
+                    <td>{{ "%.4f"|format(row.confidence) }}</td>
+                    <td>{{ "%.4f"|format(row.lift) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No market basket rules found.</p>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const brandLabels = {{ brand_chart_labels | tojson }};
+const brandValues = {{ brand_chart_values | tojson }};
+
+const categoryLabels = {{ category_chart_labels | tojson }};
+const categoryValues = {{ category_chart_values | tojson }};
+
+const segmentLabels = {{ segment_chart_labels | tojson }};
+const segmentValues = {{ segment_chart_values | tojson }};
+
+const trendingLabels = {{ trending_chart_labels | tojson }};
+const trendingValues = {{ trending_chart_values | tojson }};
+
+new Chart(document.getElementById("brandChart"), {
+    type: "bar",
+    data: {
+        labels: brandLabels,
+        datasets: [{
+            label: "Brand Count",
+            data: brandValues,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+new Chart(document.getElementById("categoryChart"), {
+    type: "bar",
+    data: {
+        labels: categoryLabels,
+        datasets: [{
+            label: "Category Count",
+            data: categoryValues,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+new Chart(document.getElementById("segmentChart"), {
+    type: "doughnut",
+    data: {
+        labels: segmentLabels,
+        datasets: [{
+            data: segmentValues,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+new Chart(document.getElementById("trendingChart"), {
+    type: "line",
+    data: {
+        labels: trendingLabels,
+        datasets: [{
+            label: "Interactions",
+            data: trendingValues,
+            tension: 0.3,
+            borderWidth: 2,
+            fill: false
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+</script>
+{% endblock %}
