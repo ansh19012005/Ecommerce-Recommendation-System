@@ -1,14 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="form-box">
-    <h2>Sign Up</h2>
-    <form method="POST" action="{{ url_for('signup') }}">
-        <input type="text" name="fullname" placeholder="Full Name" required>
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="email" name="email" placeholder="Email Address" required>
-        <input type="password" name="password" placeholder="Password" required>
+<div class="form-box auth-box">
+    <h2>Create Account</h2>
+
+    <form method="POST" action="{{ url_for('signup') }}" autocomplete="off">
+        <input type="text" name="fullname" placeholder="Full Name" required autocomplete="off">
+        <input type="text" name="username" placeholder="Username" required autocomplete="off">
+        <input type="email" name="email" placeholder="Email Address" required autocomplete="off">
+        <input type="password" name="password" placeholder="Password" required autocomplete="new-password">
         <button type="submit" class="btn">Create Account</button>
     </form>
+
+    <div class="auth-footer">
+        <p>Already have an account?</p>
+        <a href="{{ url_for('signin') }}" class="btn secondary">Login</a>
+    </div>
 </div>
 {% endblock %}

@@ -2,28 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-Commerce Recommendation System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
+    <nav class="navbar">
+        <div class="logo">E-Commerce Recommendation System</div>
+        <div class="nav-links">
+            {% if session.get('user_id') %}
+                {% if session.get('role') == 'admin' %}
+                    <a href="{{ url_for('analytics') }}">Analytics</a>
+                {% elif session.get('role') == 'user' %}
+                    <a href="{{ url_for('main') }}">Recommendations</a>
+                {% endif %}
+                <span class="nav-user">Hi, {{ session.get('username') }}</span>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('signin') }}">Login</a>
+                <a href="{{ url_for('signup') }}">Create Account</a>
+            {% endif %}
+        </div>
+    </nav>
 
-<!-- NAVBAR -->
-<nav class="navbar">
-    <div class="logo">🛒 SmartShop</div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <script>
+          document.addEventListener("DOMContentLoaded", function() {
+            {% for category, message in messages %}
+              showToast("{{ message }}", "{{ category }}");
+            {% endfor %}
+          });
+        </script>
+      {% endif %}
+    {% endwith %}
 
-    <ul class="nav-links">
-        <li><a href="/">Home</a></li>
-        <li><a href="/main">Recommendations</a></li>
-        <li><a href="/analytics">Analytics</a></li>
-        <li><a href="/signin">Login</a></li>
-    </ul>
-</nav>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
 
-<!-- MAIN CONTENT -->
-<div class="container">
-    {% block content %}{% endblock %}
-</div>
+    <div id="toast-container"></div>
 
+    <script>
+    function showToast(message, type) {
+        const container = document.getElementById("toast-container");
+        const toast = document.createElement("div");
+        toast.className = "toast " + type;
+        toast.innerText = message;
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add("show");
+        }, 100);
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+    </script>
 </body>
 </html>
